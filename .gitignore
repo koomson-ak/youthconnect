@@ -1,0 +1,95 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment files (do NOT commit secrets)
+# Keep .env.example in repo as a template
+.env
+.env.*
+!.env.example
+
+# Vite / build cache
+.vite
+
+# Dependency directories
+.pnp.cjs
+.pnp.loader.mjs
+
+# Test coverage
+coverage/
+
+# Misc
+.cache/
+.nyc_output/
+/.turbo/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# === Additional ignores added ===
+
+# Build outputs
+build/
+out/
+.parcel-cache/
+
+# Runtime files
+pids
+*.pid
+*.seed
+
+# Yarn PnP
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# TypeScript
+*.tsbuildinfo
+
+# Vercel / Netlify
+.vercel/
+.vercel_build_output/
+.netlify/
+
+# Temp
+tmp/
+temp/
+
+# IDE / Editor
+.idea/
+.vscode/
+.history/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Generated lockfile for Yarn Plug'n'Play
+.pnp.js
+
