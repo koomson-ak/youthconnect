@@ -136,6 +136,18 @@ const Index = () => {
     return false;
   };
 
+  const handleDeleteEntries = (ids: string[]) => {
+    const updatedEntries = entries.filter(entry => !ids.includes(entry.id));
+    setEntries(updatedEntries);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEntries));
+    
+    toast({
+      title: "Entries Deleted",
+      description: `${ids.length} ${ids.length === 1 ? 'entry' : 'entries'} deleted successfully.`,
+      className: "bg-primary text-primary-foreground",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       <WelcomeAnimation />
@@ -168,7 +180,7 @@ const Index = () => {
             {/* Controls and Table */}
             <div className="space-y-6">
               <AttendanceControls entries={entries} onClearAll={handleClearAll} />
-              <AttendanceTable entries={entries} />
+              <AttendanceTable entries={entries} onDeleteEntries={handleDeleteEntries} />
             </div>
 
             {/* Footer */}

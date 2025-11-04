@@ -25,14 +25,12 @@ export const Footer = () => {
 
       {/* Main Footer Text */}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <span>Made with</span>
-        <Heart className="h-4 w-4 text-destructive fill-destructive" />
-        <span>for the growth of the youth</span>
+        <span>For the growth of the youth and the Church</span>
       </div>
       
       {/* Copyright */}
       <p className="text-sm text-muted-foreground">
-        © {currentYear} Arnon Koomson. All rights reserved.
+        © {currentYear} Arnon Kobina Koomson. All rights reserved.
       </p>
     </motion.footer>
   );

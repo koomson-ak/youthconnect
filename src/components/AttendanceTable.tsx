@@ -9,8 +9,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Search, Users } from "lucide-react";
+import { Search, Users, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
 
 export interface AttendanceEntry {
   id: string;
@@ -23,12 +35,19 @@ export interface AttendanceEntry {
 
 interface AttendanceTableProps {
   entries: AttendanceEntry[];
+  onDeleteEntries?: (ids: string[]) => void;
 }
 
-export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
+export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [adminKey, setAdminKey] = useState("");
+  const [keyError, setKeyError] = useState("");
   const itemsPerPage = 10;
+
+  const ADMIN_KEY = (import.meta.env.VITE_ADMIN_KEY as string) || "";
 
   // Filter entries based on search term
   const filteredEntries = entries.filter((entry) => {
@@ -62,6 +81,45 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
     });
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(paginatedEntries.map((entry) => entry.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedIds.length === 0) return;
+    setShowDeleteDialog(true);
+    setAdminKey("");
+    setKeyError("");
+  };
+
+  const handleConfirmDelete = () => {
+    if (adminKey === ADMIN_KEY) {
+      if (onDeleteEntries) {
+        onDeleteEntries(selectedIds);
+      }
+      setSelectedIds([]);
+      setShowDeleteDialog(false);
+      setAdminKey("");
+      setKeyError("");
+    } else {
+      setKeyError("Incorrect admin key. Please try again.");
+    }
+  };
+
+  const isAllSelected = paginatedEntries.length > 0 && selectedIds.length === paginatedEntries.length;
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-4">
       {/* Header with Search */}
@@ -79,15 +137,28 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
               ({filteredEntries.length} {filteredEntries.length === 1 ? "person" : "people"})
             </span>
           </div>
-          <div className="relative flex-1 md:max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search by name or phone..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 md:max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by name or phone..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            {selectedIds.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteClick}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete ({selectedIds.length})
+              </Button>
+            )}
           </div>
         </div>
 
@@ -96,6 +167,12 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-16"></TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Phone Number</TableHead>
@@ -105,7 +182,7 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
             <TableBody>
               {paginatedEntries.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-12">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-12">
                     {searchTerm ? (
                       <div className="space-y-2">
                         <p className="text-lg">No results found</p>
@@ -130,6 +207,12 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       className="border-b hover:bg-muted/30 transition-colors"
                     >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(entry.id)}
+                          onCheckedChange={(checked) => handleSelectOne(entry.id, checked as boolean)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <div className="bg-primary/10 text-primary rounded-full h-10 w-10 flex items-center justify-center font-semibold text-sm">
                           {getInitials(entry.first_name, entry.last_name)}
@@ -192,6 +275,48 @@ export const AttendanceTable = ({ entries }: AttendanceTableProps) => {
           </div>
         )}
       </motion.div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Entries</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to delete {selectedIds.length} {selectedIds.length === 1 ? 'entry' : 'entries'}. 
+              Please enter the admin key to confirm this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Input
+              type="password"
+              placeholder="Enter admin key"
+              value={adminKey}
+              onChange={(e) => {
+                setAdminKey(e.target.value);
+                setKeyError("");
+              }}
+              className={keyError ? "border-destructive" : ""}
+            />
+            {keyError && (
+              <p className="text-sm text-destructive mt-2">{keyError}</p>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setAdminKey("");
+              setKeyError("");
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
