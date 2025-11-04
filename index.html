@@ -14,7 +14,17 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/youth_attendance.ico" />
-    <link rel="icon" href="/youth_attendance.ico" />
+    <link rel="icon" href="/church.png" />
+    
+    <!-- Set dark mode immediately to prevent flash -->
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
 
   <body>

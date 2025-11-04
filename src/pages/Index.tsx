@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
-import { AttendanceForm } from "@/components/AttendanceForm";
+import { motion } from "framer-motion";
+import { MultiStepForm } from "@/components/MultiStepForm";
 import { AttendanceTable, AttendanceEntry } from "@/components/AttendanceTable";
 import { AttendanceControls } from "@/components/AttendanceControls";
+import { HeroSection } from "@/components/HeroSection";
+import { StatsDashboard } from "@/components/StatsDashboard";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { QRCodeSection } from "@/components/QRCodeSection";
+import { WelcomeAnimation } from "@/components/WelcomeAnimation";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { getAttendances, addAttendance } from "@/lib/supabase";
 
@@ -9,6 +17,7 @@ const STORAGE_KEY = "youth_connect_attendance";
 
 const Index = () => {
   const [entries, setEntries] = useState<AttendanceEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,6 +41,7 @@ const Index = () => {
           setEntries(mapped);
           // also persist locally so a reload without network still shows data
           localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
+          setIsLoading(false);
           return;
         }
       } catch (e) {
@@ -45,6 +55,8 @@ const Index = () => {
             console.error("Error loading attendance data:", err);
           }
         }
+      } finally {
+        setIsLoading(false);
       }
     })();
 
@@ -125,15 +137,45 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-12">
-        <AttendanceForm onSubmit={handleSubmit} />
-        
-        <div className="space-y-6">
-          <AttendanceControls entries={entries} onClearAll={handleClearAll} />
-          <AttendanceTable entries={entries} />
+    <div className="min-h-screen bg-background transition-colors duration-300">
+      <WelcomeAnimation />
+      <ThemeToggle />
+      
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="py-8 px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-7xl mx-auto space-y-12"
+          >
+            {/* Hero Section */}
+            <HeroSection attendanceCount={entries.length} />
+
+            {/* Multi-Step Form */}
+            <MultiStepForm onSubmit={handleSubmit} />
+
+            {/* QR Code Button */}
+            <div className="flex justify-center">
+              <QRCodeSection />
+            </div>
+
+            {/* Stats Dashboard */}
+            <StatsDashboard entries={entries} />
+
+            {/* Controls and Table */}
+            <div className="space-y-6">
+              <AttendanceControls entries={entries} onClearAll={handleClearAll} />
+              <AttendanceTable entries={entries} />
+            </div>
+
+            {/* Footer */}
+            <Footer />
+          </motion.div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

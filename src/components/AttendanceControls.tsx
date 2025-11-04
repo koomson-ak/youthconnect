@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { AttendanceEntry } from "./AttendanceTable";
 
 interface AttendanceControlsProps {
@@ -76,24 +77,30 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
 
   return (
     <>
-      <div className="w-full max-w-4xl mx-auto flex gap-3 justify-end">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-6xl mx-auto flex gap-3 justify-end"
+      >
         <Button
           onClick={handleExportCSV}
           variant="outline"
           disabled={entries.length === 0}
-          className="transition-all duration-250 ease-in-out"
+          className="transition-all duration-250 ease-in-out gap-2"
         >
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4" />
           Export CSV
         </Button>
         <Button
           onClick={handleClearClick}
           variant="destructive"
-          className="transition-all duration-250 ease-in-out bg-destructive hover:bg-destructive/90"
+          className="transition-all duration-250 ease-in-out bg-destructive hover:bg-destructive/90 gap-2"
         >
+          <Trash2 className="h-4 w-4" />
           Clear All Entries
         </Button>
-      </div>
+      </motion.div>
 
       <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
         <DialogContent className="sm:max-w-md">
