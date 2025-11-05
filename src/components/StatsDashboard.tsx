@@ -232,24 +232,24 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">
-                        {entry.first_name} {entry.other_names && `${entry.other_names} `}
-                        {entry.last_name}
-                      </p>
-                      {entry.gender && (
-                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                          entry.gender === "Male" 
-                            ? "bg-blue-100 text-blue-700" 
-                            : "bg-pink-100 text-pink-700"
-                        }`}>
-                          {entry.gender}
-                        </span>
-                      )}
-                    </div>
+                    <p className="font-medium">
+                      {entry.first_name} {entry.other_names && `${entry.other_names} `}
+                      {entry.last_name}
+                    </p>
                     <p className="text-sm text-muted-foreground">{entry.phone}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground">{timeAgo}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground">{timeAgo}</span>
+                    {entry.gender && (
+                      <span className={`text-lg font-semibold ${
+                        entry.gender === "Male" 
+                          ? "text-blue-600" 
+                          : "text-pink-600"
+                      }`}>
+                        {entry.gender === "Male" ? "♂" : "♀"}
+                      </span>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}
