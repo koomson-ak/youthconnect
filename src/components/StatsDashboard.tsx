@@ -127,8 +127,9 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCSV}>
-            <Download className="mr-2 h-4 w-4" /> Export CSV
+          <Button variant="outline" size="sm" onClick={handleExportCSV} title="Export CSV">
+            <Download className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Export CSV</span>
           </Button>
         </div>
       </div>

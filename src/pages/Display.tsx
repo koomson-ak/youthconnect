@@ -270,7 +270,7 @@ const Display = () => {
                 onClick={() => setGenderFilter('Male')}
                 className="text-xs sm:text-sm h-8 sm:h-9"
               >
-                <User className="mr-1 h-3 w-3 sm:h-4 sm:w-4" /> Male
+                <User className="mr-1 h-4 w-4 sm:h-5 sm:w-5" /> Male
               </Button>
               <Button 
                 variant={genderFilter === 'Female' ? 'default' : 'outline'} 
@@ -278,7 +278,7 @@ const Display = () => {
                 onClick={() => setGenderFilter('Female')}
                 className="text-xs sm:text-sm h-8 sm:h-9"
               >
-                <User className="mr-1 h-3 w-3 sm:h-4 sm:w-4" /> Female
+                <User className="mr-1 h-4 w-4 sm:h-5 sm:w-5" /> Female
               </Button>
             </div>
           </motion.div>

@@ -87,7 +87,7 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-6xl mx-auto flex gap-3 justify-end"
+        className="w-full max-w-6xl mx-auto flex flex-col sm:flex-row gap-3 justify-center sm:justify-end"
       >
         <Button
           onClick={handleExportCSV}

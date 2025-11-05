@@ -160,7 +160,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                 variant="destructive"
                 size="sm"
                 onClick={handleDeleteClick}
-                className="gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap justify-center sm:justify-start"
               >
                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 Delete ({selectedIds.length})
@@ -171,16 +171,24 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
 
         {/* Table - Responsive Design */}
         <div className="border rounded-lg sm:rounded-xl overflow-hidden bg-background">
-          <div className="overflow-x-auto">
+          <div className="w-full">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-8 sm:w-10 md:w-12 px-1 sm:px-2">
-                    <div className="scale-75 sm:scale-100 origin-left">
+                  <TableHead className="w-5 sm:w-8 md:w-10 px-2 sm:px-2 md:px-3">
+                    <div className="hidden sm:block">
                       <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
                       />
+                    </div>
+                    <div className="sm:hidden flex items-center justify-center">
+                      <button
+                        onClick={() => handleSelectAll(!isAllSelected)}
+                        className="w-4 h-4 rounded border border-primary flex items-center justify-center hover:bg-primary/10 transition-colors"
+                      >
+                        {isAllSelected && <span className="text-xs text-primary font-bold">✓</span>}
+                      </button>
                     </div>
                   </TableHead>
                   <TableHead className="w-10 sm:w-12 md:w-16"></TableHead>
@@ -218,12 +226,20 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                         transition={{ duration: 0.3, delay: index * 0.05 }}
                         className="border-b hover:bg-muted/30 transition-colors text-xs sm:text-sm"
                       >
-                        <TableCell className="p-1 sm:p-3 md:p-4 w-8 sm:w-10 md:w-12">
-                          <div className="scale-75 sm:scale-100 origin-left">
+                        <TableCell className="p-1 sm:p-2 md:p-3 w-5 sm:w-8 md:w-10">
+                          <div className="hidden sm:block">
                             <Checkbox
                               checked={selectedIds.includes(entry.id)}
                               onCheckedChange={(checked) => handleSelectOne(entry.id, checked as boolean)}
                             />
+                          </div>
+                          <div className="sm:hidden flex items-center justify-center">
+                            <button
+                              onClick={() => handleSelectOne(entry.id, !selectedIds.includes(entry.id))}
+                              className="w-4 h-4 rounded border border-primary flex items-center justify-center hover:bg-primary/10 transition-colors"
+                            >
+                              {selectedIds.includes(entry.id) && <span className="text-xs text-primary font-bold">✓</span>}
+                            </button>
                           </div>
                         </TableCell>
                         <TableCell className="p-1 sm:p-3 md:p-4">
@@ -234,7 +250,11 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                         <TableCell className="font-medium p-2 sm:p-4">
                           <div className="space-y-0.5">
                             <div>{entry.first_name} {entry.other_names && `${entry.other_names} `}{entry.last_name}</div>
-                            <div className="text-xs text-muted-foreground sm:hidden">{entry.phone}</div>
+                            <div className="text-xs text-muted-foreground sm:hidden">
+                              {entry.phone}
+                              {entry.gender && <span className="mx-1">•</span>}
+                              {entry.gender}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="p-2 sm:p-4 hidden sm:table-cell">{entry.phone}</TableCell>
@@ -257,7 +277,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
             <p className="text-muted-foreground">
               Showing {startIndex + 1} to {Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length}
             </p>
-            <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+            <div className="flex gap-1 sm:gap-2 flex-wrap justify-center sm:justify-start">
               <Button
                 variant="outline"
                 size="sm"
