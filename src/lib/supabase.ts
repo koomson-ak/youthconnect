@@ -78,7 +78,7 @@ export async function clearAllAttendances() {
   const { error } = await supabase
     .from('youth_attendance')
     .delete()
-    .neq('id', '0') // Delete all rows (neq with impossible value)
+    .gte('id', 0) // Delete all rows by matching all positive IDs
 
   return { error }
 }

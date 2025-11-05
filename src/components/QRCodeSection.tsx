@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { QrCode, Download } from "lucide-react";
 
-export const QRCodeSection = () => {
+export const QRCodeSection = forwardRef<HTMLButtonElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   
   // Always point to the home page for check-in (not the display page)
@@ -46,6 +46,7 @@ export const QRCodeSection = () => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
+            ref={ref}
             variant="outline"
             size="lg"
             className="gap-2"
@@ -87,4 +88,6 @@ export const QRCodeSection = () => {
       </Dialog>
     </>
   );
-};
+});
+
+QRCodeSection.displayName = "QRCodeSection";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { MultiStepForm } from "@/components/MultiStepForm";
 import { AttendanceTable, AttendanceEntry } from "@/components/AttendanceTable";
@@ -20,6 +20,8 @@ const Index = () => {
   const [genderFilter, setGenderFilter] = useState<'All' | 'Male' | 'Female'>('All');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const statsDashboardRef = useRef<HTMLDivElement>(null);
+  const qrCodeSectionRef = useRef<any>(null);
 
   useEffect(() => {
     // Load from Supabase on mount. If Supabase fails, fall back to localStorage.
@@ -114,6 +116,13 @@ const Index = () => {
           description: 'Your attendance has been recorded.',
           className: 'bg-[hsl(160,60%,55%)] text-white border-0',
         });
+
+        // Scroll to StatsDashboard after successful submission
+        setTimeout(() => {
+          if (statsDashboardRef.current) {
+            statsDashboardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 300);
 
         return true;
       }
@@ -219,19 +228,21 @@ const Index = () => {
 
             {/* QR Code Button */}
             <div className="flex justify-center">
-              <QRCodeSection />
+              <QRCodeSection ref={qrCodeSectionRef} />
             </div>
 
             {/* Stats Dashboard */}
-            <StatsDashboard
-              entries={entries}
-              filteredEntries={entries.filter((e) => {
-                if (genderFilter === 'All') return true;
-                return e.gender === genderFilter;
-              })}
-              genderFilter={genderFilter}
-              setGenderFilter={setGenderFilter}
-            />
+            <div ref={statsDashboardRef}>
+              <StatsDashboard
+                entries={entries}
+                filteredEntries={entries.filter((e) => {
+                  if (genderFilter === 'All') return true;
+                  return e.gender === genderFilter;
+                })}
+                genderFilter={genderFilter}
+                setGenderFilter={setGenderFilter}
+              />
+            </div>
 
             {/* Controls and Table */}
             <div className="space-y-4 sm:space-y-6">
@@ -243,7 +254,7 @@ const Index = () => {
             </div>
 
             {/* Footer */}
-            <Footer />
+            <Footer qrCodeRef={qrCodeSectionRef} />
           </motion.div>
         </div>
       )}

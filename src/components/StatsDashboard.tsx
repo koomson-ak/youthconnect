@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, TrendingUp, Clock, User, Download } from "lucide-react";
+import { Users, TrendingUp, Clock, User, Download, PieChart as PieChartIcon } from "lucide-react";
 import { AttendanceEntry } from "./AttendanceTable";
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -172,7 +172,12 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
           transition={{ duration: 0.5, delay: 0.4 }}
           className="bg-card rounded-2xl shadow-lg border border-border/50 p-4 md:p-6"
         >
-          <h3 className="text-sm font-semibold mb-2">Gender Distribution</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold">Gender Distribution</h3>
+            <div className="bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 p-2 rounded-xl">
+              <PieChartIcon className="h-5 w-5" />
+            </div>
+          </div>
           <div style={{ width: "100%", height: 180 }}>
             <ResponsiveContainer>
               <PieChart>
