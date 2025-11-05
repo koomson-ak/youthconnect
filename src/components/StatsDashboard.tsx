@@ -183,6 +183,7 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                   innerRadius={50}
                   outerRadius={70}
                   paddingAngle={3}
+                  stroke="none"
                   onClick={(data) => {
                     const name = (data as any).name as string | undefined;
                     if (!name) return;
@@ -192,7 +193,7 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                   }}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value: number) => `${value} people`} />

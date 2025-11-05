@@ -16,7 +16,7 @@ import { AttendanceEntry } from "./AttendanceTable";
 
 interface AttendanceControlsProps {
   entries: AttendanceEntry[];
-  onClearAll: (key: string) => boolean;
+  onClearAll: (key: string) => Promise<boolean>;
 }
 
 // Admin key is provided via Vite env during development/build.
@@ -27,6 +27,7 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [adminKey, setAdminKey] = useState("");
   const [keyError, setKeyError] = useState("");
+  const [isClearing, setIsClearing] = useState(false);
 
   const handleExportCSV = () => {
     if (entries.length === 0) return;
@@ -62,13 +63,18 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
     setKeyError("");
   };
 
-  const handleConfirmClear = () => {
+  const handleConfirmClear = async () => {
     if (adminKey === ADMIN_KEY) {
-      const success = onClearAll(adminKey);
-      if (success) {
-        setShowClearDialog(false);
-        setAdminKey("");
-        setKeyError("");
+      setIsClearing(true);
+      try {
+        const success = await onClearAll(adminKey);
+        if (success) {
+          setShowClearDialog(false);
+          setAdminKey("");
+          setKeyError("");
+        }
+      } finally {
+        setIsClearing(false);
       }
     } else {
       setKeyError("Incorrect admin key. Please try again.");
@@ -134,6 +140,7 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
               type="button"
               variant="outline"
               onClick={() => setShowClearDialog(false)}
+              disabled={isClearing}
             >
               Cancel
             </Button>
@@ -141,9 +148,10 @@ export const AttendanceControls = ({ entries, onClearAll }: AttendanceControlsPr
               type="button"
               variant="destructive"
               onClick={handleConfirmClear}
+              disabled={isClearing}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Clear All Records
+              {isClearing ? "Clearing..." : "Clear All Records"}
             </Button>
           </DialogFooter>
         </DialogContent>

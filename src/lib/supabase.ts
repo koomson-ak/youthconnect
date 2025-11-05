@@ -56,6 +56,33 @@ export async function getAttendanceByPhone(phone: string) {
   return { data: Array.isArray(data) && data.length > 0 ? data[0] : null, error }
 }
 
+export async function deleteAttendanceById(id: string) {
+  const { error } = await supabase
+    .from('youth_attendance')
+    .delete()
+    .eq('id', id)
+
+  return { error }
+}
+
+export async function deleteMultipleAttendances(ids: string[]) {
+  const { error } = await supabase
+    .from('youth_attendance')
+    .delete()
+    .in('id', ids)
+
+  return { error }
+}
+
+export async function clearAllAttendances() {
+  const { error } = await supabase
+    .from('youth_attendance')
+    .delete()
+    .neq('id', '0') // Delete all rows (neq with impossible value)
+
+  return { error }
+}
+
 // Example realtime subscription helper. Returns an unsubscribe function.
 export function subscribeAttendances(onChange: (payload: any) => void) {
   // Using the Realtime/Channels API

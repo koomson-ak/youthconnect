@@ -33,9 +33,9 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
   });
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground rounded-3xl shadow-2xl mb-12">
-      {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-10">
+    <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-2xl mb-8 sm:mb-12 mx-0">
+      {/* Animated background pattern - hidden on mobile for performance */}
+      <div className="absolute inset-0 opacity-10 hidden sm:block">
         <div className="absolute top-0 left-0 w-full h-full">
           {[...Array(20)].map((_, i) => (
             <motion.div
@@ -61,7 +61,7 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
         </div>
       </div>
 
-      <div className="relative px-8 py-12 md:px-12 md:py-16">
+      <div className="relative px-4 py-8 sm:px-8 sm:py-12 md:px-12 md:py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
         >
           {/* Main Title */}
           <motion.h1
-            className="text-4xl md:text-6xl font-bold mb-4 text-center"
+            className="text-3xl sm:text-5xl md:text-6xl font-bold mb-2 sm:mb-4 text-center leading-tight"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -79,7 +79,7 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
           </motion.h1>
 
           <motion.p
-            className="text-xl md:text-2xl text-center mb-8 opacity-90"
+            className="text-lg sm:text-xl md:text-2xl text-center mb-6 sm:mb-8 opacity-90 px-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -88,22 +88,22 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
           </motion.p>
 
           {/* Info Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8">
             <motion.div
-              className="bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/20"
+              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-2 md:p-3 rounded-xl">
-                  <Users className="h-5 w-5 md:h-6 md:w-6" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-white/20 p-2 rounded-lg sm:rounded-xl flex-shrink-0">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </div>
-                <div>
-                  <p className="text-xs md:text-sm opacity-80">Present Today</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm opacity-80">Present Today</p>
                   <motion.p
-                    className="text-2xl md:text-3xl font-bold"
+                    className="text-xl sm:text-2xl md:text-3xl font-bold"
                     key={attendanceCount}
                     initial={{ scale: 1.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -116,37 +116,37 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
             </motion.div>
 
             <motion.div
-              className="bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/20"
+              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-2 md:p-3 rounded-xl">
-                  <Calendar className="h-5 w-5 md:h-6 md:w-6" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-white/20 p-2 rounded-lg sm:rounded-xl flex-shrink-0">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs md:text-sm opacity-80">Date</p>
-                  <p className="text-sm md:text-lg font-semibold truncate">{formattedDate}</p>
+                <div>
+                  <p className="text-xs sm:text-sm opacity-80">Date</p>
+                  <p className="text-xs sm:text-sm md:text-lg font-semibold break-words">{formattedDate}</p>
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/20 sm:col-span-2 md:col-span-1"
+              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20 sm:col-span-2 lg:col-span-1"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-2 md:p-3 rounded-xl">
-                  <Clock className="h-5 w-5 md:h-6 md:w-6" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-white/20 p-2 rounded-lg sm:rounded-xl flex-shrink-0">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </div>
-                <div>
-                  <p className="text-xs md:text-sm opacity-80">Current Time</p>
-                  <p className="text-sm md:text-lg font-semibold">{formattedTime}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm opacity-80">Current Time</p>
+                  <p className="text-xs sm:text-sm md:text-lg font-semibold">{formattedTime}</p>
                 </div>
               </div>
             </motion.div>

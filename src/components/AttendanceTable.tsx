@@ -36,7 +36,7 @@ export interface AttendanceEntry {
 
 interface AttendanceTableProps {
   entries: AttendanceEntry[];
-  onDeleteEntries?: (ids: string[]) => void;
+  onDeleteEntries?: (ids: string[]) => Promise<void>;
 }
 
 export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTableProps) => {
@@ -46,6 +46,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [adminKey, setAdminKey] = useState("");
   const [keyError, setKeyError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   const ADMIN_KEY = (import.meta.env.VITE_ADMIN_KEY as string) || "";
@@ -105,15 +106,20 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
     setKeyError("");
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (adminKey === ADMIN_KEY) {
-      if (onDeleteEntries) {
-        onDeleteEntries(selectedIds);
+      setIsDeleting(true);
+      try {
+        if (onDeleteEntries) {
+          await onDeleteEntries(selectedIds);
+        }
+        setSelectedIds([]);
+        setShowDeleteDialog(false);
+        setAdminKey("");
+        setKeyError("");
+      } finally {
+        setIsDeleting(false);
       }
-      setSelectedIds([]);
-      setShowDeleteDialog(false);
-      setAdminKey("");
-      setKeyError("");
     } else {
       setKeyError("Incorrect admin key. Please try again.");
     }
@@ -122,31 +128,31 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
   const isAllSelected = paginatedEntries.length > 0 && selectedIds.length === paginatedEntries.length;
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-4">
+    <div className="w-full max-w-6xl mx-auto space-y-3 sm:space-y-4 px-0 sm:px-2">
       {/* Header with Search */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-card rounded-2xl shadow-lg border border-border/50 p-6"
+        className="bg-card rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl border border-border/50 p-4 sm:p-6"
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div className="flex flex-col gap-3 sm:gap-4 mb-4">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Attendance List</h2>
-            <span className="text-sm text-muted-foreground">
-              ({filteredEntries.length} {filteredEntries.length === 1 ? "person" : "people"})
+            <h2 className="text-lg sm:text-xl font-semibold">Attendance List</h2>
+            <span className="text-xs sm:text-sm text-muted-foreground">
+              ({filteredEntries.length})
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 md:max-w-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search by name or phone..."
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10"
+                className="pl-9 h-9 sm:h-10 text-sm"
               />
             </div>
             {selectedIds.length > 0 && (
@@ -154,113 +160,121 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                 variant="destructive"
                 size="sm"
                 onClick={handleDeleteClick}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 Delete ({selectedIds.length})
               </Button>
             )}
           </div>
         </div>
 
-        {/* Table */}
-        <div className="border rounded-xl overflow-hidden bg-background">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="w-16"></TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Phone Number</TableHead>
-                <TableHead>Gender</TableHead>
-                <TableHead className="text-right">Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedEntries.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-12">
-                    {searchTerm ? (
-                      <div className="space-y-2">
-                        <p className="text-lg">No results found</p>
-                        <p className="text-sm">Try a different search term</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-lg">No attendance records yet</p>
-                        <p className="text-sm">Check-ins will appear here</p>
-                      </div>
-                    )}
-                  </TableCell>
+        {/* Table - Responsive Design */}
+        <div className="border rounded-lg sm:rounded-xl overflow-hidden bg-background">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-8 sm:w-10 md:w-12 px-1 sm:px-2">
+                    <div className="scale-75 sm:scale-100 origin-left">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={handleSelectAll}
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead className="w-10 sm:w-12 md:w-16"></TableHead>
+                  <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Phone</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">Gender</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Time</TableHead>
                 </TableRow>
-              ) : (
-                <AnimatePresence mode="popLayout">
-                  {paginatedEntries.map((entry, index) => (
-                    <motion.tr
-                      key={entry.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="border-b hover:bg-muted/30 transition-colors"
-                    >
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedIds.includes(entry.id)}
-                          onCheckedChange={(checked) => handleSelectOne(entry.id, checked as boolean)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="bg-primary/10 text-primary rounded-full h-10 w-10 flex items-center justify-center font-semibold text-sm">
-                          {getInitials(entry.first_name, entry.last_name)}
+              </TableHeader>
+              <TableBody>
+                {paginatedEntries.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8 sm:py-12 text-sm">
+                      {searchTerm ? (
+                        <div className="space-y-1">
+                          <p className="text-base">No results found</p>
+                          <p className="text-xs">Try a different search term</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {entry.first_name} {entry.other_names && `${entry.other_names} `}
-                        {entry.last_name}
-                      </TableCell>
-                      <TableCell>{entry.phone}</TableCell>
-                      <TableCell>{entry.gender ?? '-'}</TableCell>
-                      <TableCell className="text-right text-sm text-muted-foreground">
-                        {formatTime(entry.timestamp)}
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              )}
-            </TableBody>
-          </Table>
+                      ) : (
+                        <div className="space-y-1">
+                          <p className="text-base">No attendance records yet</p>
+                          <p className="text-xs">Check-ins will appear here</p>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {paginatedEntries.map((entry, index) => (
+                      <motion.tr
+                        key={entry.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className="border-b hover:bg-muted/30 transition-colors text-xs sm:text-sm"
+                      >
+                        <TableCell className="p-1 sm:p-3 md:p-4 w-8 sm:w-10 md:w-12">
+                          <div className="scale-75 sm:scale-100 origin-left">
+                            <Checkbox
+                              checked={selectedIds.includes(entry.id)}
+                              onCheckedChange={(checked) => handleSelectOne(entry.id, checked as boolean)}
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell className="p-1 sm:p-3 md:p-4">
+                          <div className="bg-primary/10 text-primary rounded-full h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center font-semibold text-xs sm:text-sm">
+                            {getInitials(entry.first_name, entry.last_name)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium p-2 sm:p-4">
+                          <div className="space-y-0.5">
+                            <div>{entry.first_name} {entry.other_names && `${entry.other_names} `}{entry.last_name}</div>
+                            <div className="text-xs text-muted-foreground sm:hidden">{entry.phone}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="p-2 sm:p-4 hidden sm:table-cell">{entry.phone}</TableCell>
+                        <TableCell className="p-2 sm:p-4 hidden md:table-cell">{entry.gender ?? '-'}</TableCell>
+                        <TableCell className="text-right text-muted-foreground p-2 sm:p-4 text-xs sm:text-sm">
+                          {formatTime(entry.timestamp)}
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredEntries.length)} of{" "}
-              {filteredEntries.length} entries
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm">
+            <p className="text-muted-foreground">
+              Showing {startIndex + 1} to {Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length}
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2 overflow-x-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
+                className="text-xs h-8"
               >
-                Previous
+                Prev
               </Button>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
                     key={page}
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className="w-10"
+                    className="w-8 h-8 text-xs"
                   >
                     {page}
                   </Button>
@@ -271,6 +285,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                className="text-xs h-8"
               >
                 Next
               </Button>
@@ -308,14 +323,15 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
             <AlertDialogCancel onClick={() => {
               setAdminKey("");
               setKeyError("");
-            }}>
+            }} disabled={isDeleting}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
+              disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -58,6 +58,14 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
       });
       return false;
     }
+    if (!gender) {
+      toast({
+        title: "Gender required",
+        description: "Please select your gender.",
+        variant: "destructive",
+      });
+      return false;
+    }
     return true;
   };
 
@@ -142,29 +150,29 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto px-0 sm:px-2">
       <motion.div
-        className="bg-card rounded-3xl shadow-2xl overflow-hidden border border-border/50"
+        className="bg-card rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-2xl overflow-hidden border border-border/50"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         {/* Progress Bar */}
-        <div className="bg-muted/30 p-6 pb-4">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="text-2xl font-bold">Check In</h2>
-            <span className="text-sm text-muted-foreground">
+        <div className="bg-muted/30 p-4 sm:p-6 pb-3 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2 sm:mb-3">
+            <h2 className="text-xl sm:text-2xl font-bold">Check In</h2>
+            <span className="text-xs sm:text-sm text-muted-foreground">
               Step {step} of {totalSteps}
             </span>
           </div>
           <Progress value={progress} className="h-2" />
           
-          <div className="flex justify-between mt-4 text-xs">
+          <div className="flex justify-between mt-3 sm:mt-4 text-xs gap-1">
             <span className={step >= 1 ? "text-primary font-semibold" : "text-muted-foreground"}>
               Name
             </span>
             <span className={step >= 2 ? "text-primary font-semibold" : "text-muted-foreground"}>
-              Contact
+              Details
             </span>
             <span className={step >= 3 ? "text-primary font-semibold" : "text-muted-foreground"}>
               Confirm
@@ -172,7 +180,7 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           <AnimatePresence mode="wait" custom={step}>
             {/* Step 1: Name Fields */}
             {step === 1 && (
@@ -184,10 +192,10 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <Label htmlFor="first" className="text-base">
+                  <Label htmlFor="first" className="text-sm sm:text-base">
                     First Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
@@ -196,14 +204,14 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     value={first}
                     onChange={(e) => setFirst(e.target.value)}
                     placeholder="Enter your first name"
-                    className="mt-2 h-12 text-lg"
+                    className="mt-1 sm:mt-2 h-10 sm:h-12 text-base"
                     autoFocus
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="other" className="text-base">
-                    Other Names <span className="text-muted-foreground text-sm">(Optional)</span>
+                  <Label htmlFor="other" className="text-sm sm:text-base">
+                    Other Names <span className="text-muted-foreground text-xs">(Optional)</span>
                   </Label>
                   <Input
                     id="other"
@@ -211,12 +219,12 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     value={other}
                     onChange={(e) => setOther(e.target.value)}
                     placeholder="Middle name(s)"
-                    className="mt-2 h-12 text-lg"
+                    className="mt-1 sm:mt-2 h-10 sm:h-12 text-base"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="last" className="text-base">
+                  <Label htmlFor="last" className="text-sm sm:text-base">
                     Last Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
@@ -225,17 +233,17 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     value={last}
                     onChange={(e) => setLast(e.target.value)}
                     placeholder="Enter your last name"
-                    className="mt-2 h-12 text-lg"
+                    className="mt-1 sm:mt-2 h-10 sm:h-12 text-base"
                   />
                 </div>
 
                 <Button
                   onClick={handleNext}
-                  className="w-full h-12 text-lg"
+                  className="w-full h-10 sm:h-12 text-base"
                   size="lg"
                 >
                   Continue
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </motion.div>
             )}
@@ -250,10 +258,10 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 <div>
-                  <Label htmlFor="phone" className="text-base">
+                  <Label htmlFor="phone" className="text-sm sm:text-base">
                     Phone Number <span className="text-destructive">*</span>
                   </Label>
                   <Input
@@ -262,19 +270,19 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0XX XXX XXXX"
-                    className="mt-2 h-12 text-lg"
+                    className="mt-1 sm:mt-2 h-10 sm:h-12 text-base"
                     autoFocus
                   />
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                     We'll use this to track your attendance
                   </p>
-                  <div className="mt-4">
-                    <Label htmlFor="gender" className="text-base">
-                      Gender <span className="text-muted-foreground text-sm">(Optional)</span>
+                  <div className="mt-3 sm:mt-4">
+                    <Label htmlFor="gender" className="text-sm sm:text-base">
+                      Gender <span className="text-destructive">*</span>
                     </Label>
                     <Select value={gender ?? ""} onValueChange={(v) => setGender(v || undefined)}>
-                      <SelectTrigger className="mt-2 h-12 text-lg">
-                        <SelectValue placeholder="Select gender (optional)" />
+                      <SelectTrigger className="mt-1 sm:mt-2 h-10 sm:h-12 text-base">
+                        <SelectValue placeholder="Select your gender" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Male">Male</SelectItem>
@@ -283,8 +291,8 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     </Select>
                   </div>
                   {existingRecord && (
-                    <div className="mt-4 bg-muted/30 rounded-lg p-4 text-sm space-y-2">
-                      <div className="flex items-center justify-between">
+                    <div className="mt-3 sm:mt-4 bg-muted/30 rounded-lg p-3 sm:p-4 text-xs sm:text-sm space-y-2">
+                      <div className="flex items-center justify-between gap-2">
                         <h4 className="font-semibold">Existing Record Found</h4>
                         <div>
                           <Button size="sm" variant="ghost" onClick={() => {
@@ -292,16 +300,16 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                             setLast(existingRecord.last_name);
                             setOther(existingRecord.other_names || "");
                             setGender(existingRecord.gender || undefined);
-                          }}>
+                          }} className="text-xs sm:text-sm h-8 sm:h-9">
                             Use this
                           </Button>
                         </div>
                       </div>
-                      <div className="flex justify-between text-muted-foreground">
+                      <div className="flex justify-between text-muted-foreground gap-2">
                         <span>Name</span>
-                        <span className="font-medium">{existingRecord.first_name} {existingRecord.other_names && `${existingRecord.other_names} `}{existingRecord.last_name}</span>
+                        <span className="font-medium text-right">{existingRecord.first_name} {existingRecord.other_names && `${existingRecord.other_names} `}{existingRecord.last_name}</span>
                       </div>
-                      <div className="flex justify-between text-muted-foreground items-center">
+                      <div className="flex justify-between text-muted-foreground items-center gap-2">
                         <span>Phone</span>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{existingRecord.phone}</span>
@@ -311,32 +319,32 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                         </div>
                       </div>
                       {existingRecord.timestamp && (
-                        <div className="flex justify-between text-muted-foreground">
+                        <div className="flex justify-between text-muted-foreground gap-2">
                           <span>Last checked</span>
-                          <span className="font-medium">{new Date(existingRecord.timestamp).toLocaleString()}</span>
+                          <span className="font-medium text-right">{new Date(existingRecord.timestamp).toLocaleString()}</span>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   <Button
                     onClick={handleBack}
                     variant="outline"
-                    className="flex-1 h-12"
+                    className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
                     size="lg"
                   >
-                    <ArrowLeft className="mr-2 h-5 w-5" />
+                    <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                     Back
                   </Button>
                   <Button
                     onClick={handleNext}
-                    className="flex-1 h-12"
+                    className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
                     size="lg"
                   >
                     Continue
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </div>
               </motion.div>
@@ -352,20 +360,20 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 {!isSubmitted ? (
                   <>
-                    <div className="bg-muted/50 rounded-2xl p-6 space-y-4">
-                      <h3 className="text-lg font-semibold flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-primary" />
+                    <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         Confirm Your Details
                       </h3>
-                      <div className="space-y-3 text-sm">
-                        <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                        <div className="grid grid-cols-1 gap-2 sm:gap-3">
                           <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Full name</span>
-                            <span className="font-medium">{first} {other && `${other} `}{last}</span>
+                            <span className="font-medium text-right">{first} {other && `${other} `}{last}</span>
                           </div>
 
                           <div className="flex items-center justify-between">
@@ -381,25 +389,25 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3">
                       <Button
                         onClick={handleBack}
                         variant="outline"
-                        className="flex-1 h-12"
+                        className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
                         size="lg"
                         disabled={isSubmitting}
                       >
-                        <ArrowLeft className="mr-2 h-5 w-5" />
+                        <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                         Back
                       </Button>
                       <Button
                         onClick={handleSubmit}
-                        className="flex-1 h-12"
+                        className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
                         size="lg"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? "Submitting..." : "Submit"}
-                        <Check className="ml-2 h-5 w-5" />
+                        <Check className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                       </Button>
                     </div>
                   </>
@@ -407,10 +415,10 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="text-center py-12"
+                    className="text-center py-8 sm:py-12"
                   >
                     <motion.div
-                      className="inline-block bg-success/10 rounded-full p-6 mb-6"
+                      className="inline-block bg-success/10 rounded-full p-4 sm:p-6 mb-4 sm:mb-6"
                       animate={{
                         scale: [1, 1.1, 1],
                       }}
@@ -419,10 +427,10 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                         repeat: 2,
                       }}
                     >
-                      <Check className="h-16 w-16 text-success" />
+                      <Check className="h-12 w-12 sm:h-16 sm:w-16 text-success" />
                     </motion.div>
-                    <h3 className="text-2xl font-bold mb-2">All Set!</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">All Set!</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
                       Your attendance has been recorded successfully.
                     </p>
                   </motion.div>
