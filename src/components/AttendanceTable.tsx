@@ -29,6 +29,7 @@ export interface AttendanceEntry {
   first_name: string;
   last_name: string;
   other_names?: string | null;
+  gender?: string | null;
   phone: string;
   timestamp: string;
 }
@@ -176,6 +177,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                 <TableHead className="w-16"></TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Phone Number</TableHead>
+                <TableHead>Gender</TableHead>
                 <TableHead className="text-right">Time</TableHead>
               </TableRow>
             </TableHeader>
@@ -223,6 +225,7 @@ export const AttendanceTable = ({ entries, onDeleteEntries }: AttendanceTablePro
                         {entry.last_name}
                       </TableCell>
                       <TableCell>{entry.phone}</TableCell>
+                      <TableCell>{entry.gender ?? '-'}</TableCell>
                       <TableCell className="text-right text-sm text-muted-foreground">
                         {formatTime(entry.timestamp)}
                       </TableCell>

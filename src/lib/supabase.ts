@@ -17,6 +17,7 @@ export type Attendance = {
   first_name: string
   last_name: string
   other_names?: string | null
+  gender?: string | null
   phone: string
   // timestamp is set by the database (timestamptz)
   timestamp?: string | null
@@ -32,13 +33,27 @@ export async function getAttendances() {
   return { data, error }
 }
 
-export async function addAttendance(entry: Pick<Attendance, 'first_name' | 'last_name' | 'other_names' | 'phone'>) {
+export async function addAttendance(entry: Pick<Attendance, 'first_name' | 'last_name' | 'other_names' | 'phone' | 'gender'>) {
   const { data, error } = await supabase
     .from('youth_attendance')
     .insert(entry)
     .select()
 
   return { data, error }
+}
+
+export async function getAttendanceByPhone(phone: string) {
+  if (!phone) return { data: null, error: null }
+
+  const { data, error } = await supabase
+    .from('youth_attendance')
+    .select('*')
+    .eq('phone', phone)
+    .order('timestamp', { ascending: false })
+    .limit(1)
+
+  // data will be an array; return the first item for convenience
+  return { data: Array.isArray(data) && data.length > 0 ? data[0] : null, error }
 }
 
 // Example realtime subscription helper. Returns an unsubscribe function.

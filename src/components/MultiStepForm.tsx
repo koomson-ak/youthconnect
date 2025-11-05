@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { getAttendanceByPhone } from "@/lib/supabase";
+import type { Attendance } from "@/lib/supabase";
 
 interface MultiStepFormProps {
-  onSubmit: (first: string, last: string, other: string, phone: string) => Promise<boolean>;
+  onSubmit: (first: string, last: string, other: string, phone: string, gender?: string) => Promise<boolean>;
 }
 
 export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
@@ -17,8 +19,10 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
   const [last, setLast] = useState("");
   const [other, setOther] = useState("");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState<string | undefined>(undefined);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingRecord, setExistingRecord] = useState<Attendance | null>(null);
   const { toast } = useToast();
 
   const totalSteps = 3;
@@ -62,6 +66,39 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
     setStep(step + 1);
   };
 
+  // When the phone changes, attempt to fetch an existing attendance by phone.
+  // Debounce to avoid rapid requests as the user types.
+  useEffect(() => {
+    let mounted = true;
+    let timer: number | undefined;
+
+    const trimmed = phone.trim();
+    if (trimmed.length >= 7) {
+      timer = window.setTimeout(async () => {
+        try {
+          const { data, error } = await getAttendanceByPhone(trimmed);
+          if (!mounted) return;
+          if (error) {
+            // ignore errors for this lightweight lookup
+            setExistingRecord(null);
+            return;
+          }
+
+          setExistingRecord(data as Attendance | null);
+        } catch (e) {
+          if (mounted) setExistingRecord(null);
+        }
+      }, 400);
+    } else {
+      setExistingRecord(null);
+    }
+
+    return () => {
+      mounted = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [phone]);
+
   const handleBack = () => {
     setStep(step - 1);
   };
@@ -69,7 +106,7 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const success = await onSubmit(first.trim(), last.trim(), other.trim(), phone.trim());
+  const success = await onSubmit(first.trim(), last.trim(), other.trim(), phone.trim(), gender);
 
       if (success) {
         setIsSubmitted(true);
@@ -80,6 +117,7 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
           setLast("");
           setOther("");
           setPhone("");
+          setGender(undefined);
         }, 3000);
       }
     } finally {
@@ -229,6 +267,58 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                   <p className="text-sm text-muted-foreground mt-2">
                     We'll use this to track your attendance
                   </p>
+                  <div className="mt-4">
+                    <Label htmlFor="gender" className="text-base">
+                      Gender <span className="text-muted-foreground text-sm">(Optional)</span>
+                    </Label>
+                    <select
+                      id="gender"
+                      value={gender ?? ""}
+                      onChange={(e) => setGender(e.target.value || undefined)}
+                      className="mt-2 h-12 text-lg w-full rounded-md border bg-input px-3"
+                    >
+                      <option value="">Select gender (optional)</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                  {existingRecord && (
+                    <div className="mt-4 bg-muted/30 rounded-lg p-4 text-sm space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold">Existing Record Found</h4>
+                        <div>
+                          <Button size="sm" variant="ghost" onClick={() => {
+                            setFirst(existingRecord.first_name);
+                            setLast(existingRecord.last_name);
+                            setOther(existingRecord.other_names || "");
+                            setGender(existingRecord.gender || undefined);
+                          }}>
+                            Use this
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Name</span>
+                        <span className="font-medium">{existingRecord.first_name} {existingRecord.other_names && `${existingRecord.other_names} `}{existingRecord.last_name}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Phone</span>
+                        <span className="font-medium">{existingRecord.phone}</span>
+                      </div>
+                      {existingRecord.gender && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Gender</span>
+                          <span className="font-medium">{existingRecord.gender}</span>
+                        </div>
+                      )}
+                      {existingRecord.timestamp && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Last checked</span>
+                          <span className="font-medium">{new Date(existingRecord.timestamp).toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3">

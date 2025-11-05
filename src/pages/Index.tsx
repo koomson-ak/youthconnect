@@ -35,6 +35,7 @@ const Index = () => {
             first_name: r.first_name,
             last_name: r.last_name,
             other_names: r.other_names,
+            gender: r.gender,
             phone: r.phone,
             timestamp: r.timestamp,
           }));
@@ -65,10 +66,10 @@ const Index = () => {
     };
   }, []);
 
-  const handleSubmit = async (first: string, last: string, other: string, phone: string): Promise<boolean> => {
+  const handleSubmit = async (first: string, last: string, other: string, phone: string, gender?: string): Promise<boolean> => {
     // attempt to insert into Supabase; handle unique-phone errors from the DB
     try {
-      const { data, error } = await addAttendance({ first_name: first, last_name: last, other_names: other, phone });
+      const { data, error } = await addAttendance({ first_name: first, last_name: last, other_names: other, phone, gender });
       if (error) {
         // Postgres unique_violation is code 23505
         const isDuplicate = String(error?.code || '').includes('23505') || String(error?.message || '').toLowerCase().includes('duplicate');
@@ -97,6 +98,7 @@ const Index = () => {
           first_name: inserted.first_name,
           last_name: inserted.last_name,
           other_names: inserted.other_names,
+          gender: inserted.gender,
           phone: inserted.phone,
           timestamp: inserted.timestamp,
         };
