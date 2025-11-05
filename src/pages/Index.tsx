@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAttendances, addAttendance, deleteMultipleAttendances, clearAllAttendances } from "@/lib/supabase";
 
 const STORAGE_KEY = "youth_connect_attendance";
+const ADMIN_KEY = (import.meta.env.VITE_ADMIN_KEY as string) || "";
 
 const Index = () => {
   const [entries, setEntries] = useState<AttendanceEntry[]>([]);
@@ -136,7 +137,7 @@ const Index = () => {
   };
 
   const handleClearAll = async (key: string): Promise<boolean> => {
-    if (key === "KOBINA2025ADMIN") {
+    if (key === ADMIN_KEY) {
       try {
         // Delete from Supabase first
         const { error } = await clearAllAttendances();
