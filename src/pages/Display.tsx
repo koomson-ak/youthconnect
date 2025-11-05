@@ -168,18 +168,18 @@ const Display = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.15 }}
-            className="bg-card rounded-xl sm:rounded-2xl md:rounded-3xl shadow-md sm:shadow-lg md:shadow-xl border-2 border-blue-500/20 p-3 sm:p-4 md:p-8"
+            className="bg-card rounded-xl sm:rounded-2xl md:rounded-3xl shadow-md sm:shadow-lg md:shadow-xl border-2 border-primary/20 p-3 sm:p-4 md:p-8"
           >
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-              <div className="bg-blue-100 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl flex-shrink-0">
-                <User className="h-4 w-4 sm:h-5 sm:w-5 md:h-10 md:w-10 text-blue-600" />
+              <div className="bg-primary/10 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl md:rounded-2xl flex-shrink-0">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 md:h-10 md:w-10 text-primary" />
               </div>
               <div>
                 <p className="text-xs sm:text-sm md:text-base text-muted-foreground uppercase tracking-wide">
                   Male
                 </p>
                 <motion.p
-                  className="text-2xl sm:text-3xl md:text-5xl font-bold text-blue-600"
+                  className="text-2xl sm:text-3xl md:text-5xl font-bold text-primary"
                   key={maleCount}
                   initial={{ scale: 1.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -346,11 +346,11 @@ const Display = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 50 }}
                     transition={{ duration: 0.4, delay: index * 0.03 }}
-                    className="flex items-center gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50"
+                    className="flex items-center gap-2 sm:gap-3 md:gap-4 p-3 sm:p-3 md:p-4 rounded-lg sm:rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50"
                   >
                     <div className={`rounded-full h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 flex items-center justify-center font-bold text-sm sm:text-base md:text-lg border-2 flex-shrink-0 ${
                       entry.gender === "Male"
-                        ? "bg-blue-100 text-blue-700 border-blue-200"
+                        ? "bg-primary/10 text-primary border-primary/20"
                         : entry.gender === "Female"
                         ? "bg-pink-100 text-pink-700 border-pink-200"
                         : "bg-primary/10 text-primary border-primary/20"
@@ -358,7 +358,7 @@ const Display = () => {
                       {getInitials(entry.first_name, entry.last_name)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm sm:text-base md:text-lg font-semibold truncate">
+                      <p className="text-sm sm:text-base md:text-lg font-semibold break-words line-clamp-2">
                         {entry.first_name} {entry.other_names && `${entry.other_names} `}
                         {entry.last_name}
                       </p>
@@ -369,9 +369,9 @@ const Display = () => {
                         {formatTime(entry.timestamp)}
                       </p>
                       {entry.gender && (
-                        <span className={`text-base sm:text-lg md:text-2xl font-semibold ${
+                        <span className={`text-2xl sm:text-3xl font-semibold ${
                           entry.gender === "Male" 
-                            ? "text-blue-600" 
+                            ? "text-primary" 
                             : "text-pink-600"
                         }`}>
                           {entry.gender === "Male" ? "♂" : "♀"}

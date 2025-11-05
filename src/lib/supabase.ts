@@ -75,10 +75,20 @@ export async function deleteMultipleAttendances(ids: string[]) {
 }
 
 export async function clearAllAttendances() {
+  // Get all IDs first, then delete them
+  const { data: allEntries } = await supabase
+    .from('youth_attendance')
+    .select('id')
+
+  if (!allEntries || allEntries.length === 0) {
+    return { error: null }
+  }
+
+  const ids = allEntries.map(e => e.id)
   const { error } = await supabase
     .from('youth_attendance')
     .delete()
-    .gte('id', 0) // Delete all rows by matching all positive IDs
+    .in('id', ids)
 
   return { error }
 }

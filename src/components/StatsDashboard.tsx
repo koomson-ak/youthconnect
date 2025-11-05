@@ -4,6 +4,16 @@ import { AttendanceEntry } from "./AttendanceTable";
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
   PieChart,
   Pie,
   Cell,
@@ -12,6 +22,20 @@ import {
   Legend,
 } from "recharts";
 
+const ADMIN_KEY = (import.meta.env.VITE_ADMIN_KEY as string) || "";
+
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-card border-2 border-primary rounded-lg px-4 py-2 shadow-xl">
+        <p className="text-foreground font-semibold text-sm">{payload[0].name}</p>
+        <p className="text-primary font-bold text-lg">{payload[0].value} people</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 interface StatsDashboardProps {
   entries: AttendanceEntry[]; // full dataset
   filteredEntries: AttendanceEntry[]; // entries after filter
@@ -19,10 +43,14 @@ interface StatsDashboardProps {
   setGenderFilter: (f: "All" | "Male" | "Female") => void;
 }
 
-const COLORS = ["#4F46E5", "#EC4899", "#9CA3AF"]; // primary (male), pink (female), gray (unknown)
+const COLORS = ["#008EBD", "#EC4899", "#9CA3AF"]; // primary (male), pink (female), gray (unknown)
 
 export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGenderFilter }: StatsDashboardProps) => {
   const [displayCount, setDisplayCount] = useState(0);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [adminKey, setAdminKey] = useState("");
+  const [keyError, setKeyError] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const totalCount = entries.length;
 
   // Animated counter
@@ -63,28 +91,47 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
 
   // CSV export for filtered entries
   const handleExportCSV = () => {
-    const rows = filteredEntries.map((r) => ({
-      id: r.id,
-      first_name: r.first_name,
-      other_names: r.other_names || "",
-      last_name: r.last_name,
-      phone: r.phone,
-      gender: r.gender || "",
-      timestamp: r.timestamp,
-    }));
+    setShowExportDialog(true);
+    setAdminKey("");
+    setKeyError("");
+  };
 
-    const header = Object.keys(rows[0] || {}).join(",");
-    const csv = [header]
-      .concat(rows.map((row) => Object.values(row).map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")))
-      .join("\n");
+  const handleConfirmExport = () => {
+    if (adminKey === ADMIN_KEY) {
+      setIsExporting(true);
+      try {
+        const rows = filteredEntries.map((r) => ({
+          id: r.id,
+          first_name: r.first_name,
+          other_names: r.other_names || "",
+          last_name: r.last_name,
+          phone: r.phone,
+          gender: r.gender || "",
+          timestamp: r.timestamp,
+        }));
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `attendance_export_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+        const header = Object.keys(rows[0] || {}).join(",");
+        const csv = [header]
+          .concat(rows.map((row) => Object.values(row).map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")))
+          .join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `attendance_export_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        setShowExportDialog(false);
+        setAdminKey("");
+        setKeyError("");
+      } finally {
+        setIsExporting(false);
+      }
+    } else {
+      setKeyError("Incorrect admin key. Please try again.");
+    }
   };
 
   const stats = [
@@ -202,7 +249,10 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => `${value} people`} />
+                <Tooltip 
+                  content={CustomTooltip}
+                  cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+                />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -233,10 +283,14 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className="flex items-center gap-4 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                 >
-                  <div className="relative">
-                    <div className="bg-primary/10 text-primary rounded-full h-10 w-10 flex items-center justify-center font-semibold">
-                      {getInitials(entry.first_name, entry.last_name)}
-                    </div>
+                  <div className={`rounded-full h-10 w-10 flex items-center justify-center font-bold text-sm border-2 flex-shrink-0 ${
+                    entry.gender === "Male"
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : entry.gender === "Female"
+                      ? "bg-pink-100 text-pink-700 border-pink-200"
+                      : "bg-primary/10 text-primary border-primary/20"
+                  }`}>
+                    {getInitials(entry.first_name, entry.last_name)}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">
@@ -248,9 +302,9 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">{timeAgo}</span>
                     {entry.gender && (
-                      <span className={`text-lg font-semibold ${
+                      <span className={`text-xl font-semibold ${
                         entry.gender === "Male" 
-                          ? "text-blue-600" 
+                          ? "text-primary" 
                           : "text-pink-600"
                       }`}>
                         {entry.gender === "Male" ? "♂" : "♀"}
@@ -263,6 +317,53 @@ export const StatsDashboard = ({ entries, filteredEntries, genderFilter, setGend
           </div>
         </motion.div>
       )}
+
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Admin Verification Required</DialogTitle>
+            <DialogDescription>
+              Please enter the admin key to export attendance records.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="export-admin-key">Admin Key</Label>
+              <Input
+                id="export-admin-key"
+                type="password"
+                value={adminKey}
+                onChange={(e) => {
+                  setAdminKey(e.target.value);
+                  setKeyError("");
+                }}
+                placeholder="Enter admin key"
+                onKeyDown={(e) => e.key === "Enter" && handleConfirmExport()}
+              />
+              {keyError && (
+                <p className="text-sm text-destructive">{keyError}</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowExportDialog(false)}
+              disabled={isExporting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmExport}
+              disabled={isExporting}
+            >
+              {isExporting ? "Exporting..." : "Export CSV"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
