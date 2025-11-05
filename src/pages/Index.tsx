@@ -17,6 +17,7 @@ const STORAGE_KEY = "youth_connect_attendance";
 
 const Index = () => {
   const [entries, setEntries] = useState<AttendanceEntry[]>([]);
+  const [genderFilter, setGenderFilter] = useState<'All' | 'Male' | 'Female'>('All');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -177,12 +178,23 @@ const Index = () => {
             </div>
 
             {/* Stats Dashboard */}
-            <StatsDashboard entries={entries} />
+            <StatsDashboard
+              entries={entries}
+              filteredEntries={entries.filter((e) => {
+                if (genderFilter === 'All') return true;
+                return e.gender === genderFilter;
+              })}
+              genderFilter={genderFilter}
+              setGenderFilter={setGenderFilter}
+            />
 
             {/* Controls and Table */}
             <div className="space-y-6">
               <AttendanceControls entries={entries} onClearAll={handleClearAll} />
-              <AttendanceTable entries={entries} onDeleteEntries={handleDeleteEntries} />
+              <AttendanceTable entries={entries.filter((e) => {
+                if (genderFilter === 'All') return true;
+                return e.gender === genderFilter;
+              })} onDeleteEntries={handleDeleteEntries} />
             </div>
 
             {/* Footer */}

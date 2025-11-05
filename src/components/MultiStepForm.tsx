@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -271,16 +272,15 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                     <Label htmlFor="gender" className="text-base">
                       Gender <span className="text-muted-foreground text-sm">(Optional)</span>
                     </Label>
-                    <select
-                      id="gender"
-                      value={gender ?? ""}
-                      onChange={(e) => setGender(e.target.value || undefined)}
-                      className="mt-2 h-12 text-lg w-full rounded-md border bg-input px-3"
-                    >
-                      <option value="">Select gender (optional)</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
+                    <Select value={gender ?? ""} onValueChange={(v) => setGender(v || undefined)}>
+                      <SelectTrigger className="mt-2 h-12 text-lg">
+                        <SelectValue placeholder="Select gender (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {existingRecord && (
                     <div className="mt-4 bg-muted/30 rounded-lg p-4 text-sm space-y-2">
@@ -301,16 +301,15 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                         <span>Name</span>
                         <span className="font-medium">{existingRecord.first_name} {existingRecord.other_names && `${existingRecord.other_names} `}{existingRecord.last_name}</span>
                       </div>
-                      <div className="flex justify-between text-muted-foreground">
+                      <div className="flex justify-between text-muted-foreground items-center">
                         <span>Phone</span>
-                        <span className="font-medium">{existingRecord.phone}</span>
-                      </div>
-                      {existingRecord.gender && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Gender</span>
-                          <span className="font-medium">{existingRecord.gender}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{existingRecord.phone}</span>
+                          {existingRecord.gender && (
+                            <span className="text-xs font-medium px-2 py-1 rounded-full bg-muted/20 text-muted-foreground">{existingRecord.gender}</span>
+                          )}
                         </div>
-                      )}
+                      </div>
                       {existingRecord.timestamp && (
                         <div className="flex justify-between text-muted-foreground">
                           <span>Last checked</span>
@@ -363,15 +362,21 @@ export const MultiStepForm = ({ onSubmit }: MultiStepFormProps) => {
                         Confirm Your Details
                       </h3>
                       <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Full Name:</span>
-                          <span className="font-medium">
-                            {first} {other && `${other} `}{last}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Phone:</span>
-                          <span className="font-medium">{phone}</span>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Full name</span>
+                            <span className="font-medium">{first} {other && `${other} `}{last}</span>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Phone number</span>
+                            <span className="font-medium">{phone}</span>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Gender</span>
+                            <span className="font-medium">{gender ?? 'Not specified'}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
