@@ -116,19 +116,19 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
             </motion.div>
 
             <motion.div
-              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20"
+              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20 sm:col-span-2 lg:col-span-1 flex justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 whitespace-nowrap">
                 <div className="bg-white/20 p-2 rounded-lg sm:rounded-xl flex-shrink-0">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm opacity-80">Date</p>
-                  <p className="text-xs sm:text-sm md:text-lg font-semibold break-words">{formattedDate}</p>
+                  <p className="text-xs sm:text-sm md:text-lg font-semibold">{formattedDate}</p>
                 </div>
               </div>
             </motion.div>
