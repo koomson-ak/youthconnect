@@ -116,7 +116,7 @@ export const HeroSection = ({ attendanceCount }: HeroSectionProps) => {
             </motion.div>
 
             <motion.div
-              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-white/20 sm:col-span-2 lg:col-span-1 flex justify-center"
+              className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl px-3 py-3 sm:p-4 md:p-6 border border-white/20 sm:col-span-2 lg:col-span-1 flex justify-start sm:justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
